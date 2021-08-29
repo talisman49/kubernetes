@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmeter-deployment
+spec:
+  selector:
+    matchLabels:
+      app: jmeter
+  replicas: 1    
+  template:
+    metadata:
+      labels:
+        app: jmeter
+    spec:    
+      containers:
+      - name: jmeter
+        image: justb4/jmeter
+        resources:
+          requests:
+            memory: "4Mi"
+            cpu: "20m"
+          limits:
+            memory: "8Mi"
+            cpu: "50m"
+        readinessProbe:
+          httpget:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        ports:
+        - containerPort: 80  

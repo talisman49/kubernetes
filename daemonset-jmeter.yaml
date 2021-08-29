@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: jmeter-deployment
+spec:
+  selector:
+    matchLabels:
+      app: jmeter
+  template:
+    metadata:
+      lables:
+        app: jmeter
+    spec:    
+      containers:
+      - name: jmeter
+        image: justb4/jmeter
+        env:
+        - name: HOLA_MUNDO
+          value: "hola mundo"
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        resources:
+          requests:
+            memory: "4Mi"
+            cpu: "20m"
+          limits:
+            memory: "8Mi"
+            cpu: "50m"
+        readinessProbe:
+          httpget:
+            path: /
+            port: 9090
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 9090
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        ports:
+        - containerPort: 9090  
